@@ -1,0 +1,23 @@
+# udev rules for ZWO ASI cameras
+# Copy to /etc/udev/rules.d/99-zwo.rules
+# Then run: sudo udevadm control --reload-rules && sudo udevadm trigger
+
+# ZWO ASI cameras
+SUBSYSTEM=="usb", ATTR{idVendor}=="03c3", MODE="0666", GROUP="video"
+
+# Grant access to specific camera models
+# ASI224MC
+SUBSYSTEM=="usb", ATTR{idVendor}=="03c3", ATTR{idProduct}=="224c", MODE="0666", GROUP="video"
+# ASI120MC
+SUBSYSTEM=="usb", ATTR{idVendor}=="03c3", ATTR{idProduct}=="120c", MODE="0666", GROUP="video"
+# ASI290MC
+SUBSYSTEM=="usb", ATTR{idVendor}=="03c3", ATTR{idProduct}=="290c", MODE="0666", GROUP="video"
+# ASI385MC
+SUBSYSTEM=="usb", ATTR{idVendor}=="03c3", ATTR{idProduct}=="385c", MODE="0666", GROUP="video"
+# ASI178MC
+SUBSYSTEM=="usb", ATTR{idVendor}=="03c3", ATTR{idProduct}=="178c", MODE="0666", GROUP="video"
+# ASI294MC
+SUBSYSTEM=="usb", ATTR{idVendor}=="03c3", ATTR{idProduct}=="294c", MODE="0666", GROUP="video"
+
+# Generic rule for all ZWO devices
+SUBSYSTEM=="usb", ATTR{idVendor}=="03c3", TAG+="uaccess"

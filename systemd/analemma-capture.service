@@ -1,0 +1,34 @@
+[Unit]
+Description=Analemma Solar Capture Service
+Documentation=https://github.com/analemma-project/analemma-capture
+After=network.target
+
+[Service]
+Type=simple
+User=pi
+Group=pi
+WorkingDirectory=/home/pi/analemma-capture
+ExecStart=/home/pi/analemma-capture/venv/bin/analemma daemon
+Restart=always
+RestartSec=10
+
+# Environment
+Environment="PATH=/home/pi/analemma-capture/venv/bin:/usr/bin:/bin"
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=analemma
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/pi/analemma/images /var/log/analemma /home/pi/.analemma
+
+# Resource limits
+MemoryMax=256M
+CPUQuota=50%
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,49 @@
+# Analemma Solar Capture System Configuration
+# Copy this file to config.yaml and customize as needed
+
+camera:
+  # Exposure time in microseconds
+  # For solar photography with welding shade #11, start with 1000 (1ms)
+  exposure_us: 1000
+
+  # Gain (0-300)
+  # Recommend minimum (0) for solar photography
+  gain: 0
+
+  # Image format: fits, png, or raw
+  # FITS is recommended for astronomical use
+  image_type: "fits"
+
+  # White balance settings
+  wb_r: 52
+  wb_b: 95
+
+schedule:
+  # Capture time in HH:MM format (24-hour clock)
+  capture_time: "12:00"
+
+  # Timezone for scheduling
+  timezone: "Asia/Tokyo"
+
+storage:
+  # Base directory for captured images
+  base_path: "/home/pi/analemma/images"
+
+  # Create monthly subfolders (YYYY-MM/)
+  monthly_subfolders: true
+
+  # Minimum free space warning threshold (MB)
+  min_free_space_mb: 1024
+
+logging:
+  # Log level: DEBUG, INFO, WARNING, ERROR, CRITICAL
+  level: "INFO"
+
+  # Log file path (null for console only)
+  file: "/var/log/analemma/capture.log"
+
+  # Maximum log file size (MB) before rotation
+  max_size_mb: 10
+
+  # Number of backup log files to keep
+  backup_count: 5
