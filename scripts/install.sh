@@ -55,7 +55,7 @@ if [ "$SUDO_INSTALL" = true ]; then
     echo ""
     echo "Installing system dependencies..."
     apt-get update
-    apt-get install -y libusb-1.0-0-dev
+    apt-get install -y libusb-1.0-0-dev libjpeg-dev zlib1g-dev libpng-dev
     echo -e "  ${GREEN}System dependencies installed${NC}"
 fi
 
