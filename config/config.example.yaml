@@ -6,9 +6,9 @@ camera:
   # For solar photography with welding shade #11, start with 1000 (1ms)
   exposure_us: 1000
 
-  # Gain (0-300)
-  # Recommend minimum (0) for solar photography
-  gain: 0
+  # Gain (0-600)
+  # Adjust based on your camera and filter setup
+  gain: 300
 
   # Image format: fits, png, or raw
   # FITS is recommended for astronomical use

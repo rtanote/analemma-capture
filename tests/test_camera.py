@@ -74,7 +74,7 @@ class TestCameraControllerNoHardware:
         controller = CameraController(camera_config)
         controller._camera = MagicMock()  # Pretend connected
         with pytest.raises(ValueError, match="Gain must be between"):
-            controller.set_gain(500)
+            controller.set_gain(700)
 
 
 class TestCameraControllerMocked:

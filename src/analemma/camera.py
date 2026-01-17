@@ -220,13 +220,13 @@ class CameraController:
         """Set gain.
 
         Args:
-            gain: Gain value (0-300).
+            gain: Gain value (0-600).
         """
         if self._camera is None:
             raise CameraError("Camera not connected")
 
-        if not 0 <= gain <= 300:
-            raise ValueError("Gain must be between 0 and 300")
+        if not 0 <= gain <= 600:
+            raise ValueError("Gain must be between 0 and 600")
 
         self.config.gain = gain
         self._camera.set_control_value(asi.ASI_GAIN, gain, auto=False)
