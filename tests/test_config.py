@@ -12,6 +12,7 @@ from analemma.config import (
     LoggingConfig,
     ScheduleConfig,
     StorageConfig,
+    SyncConfig,
     load_config,
     save_config,
 )
@@ -107,6 +108,39 @@ class TestLoggingConfig:
             LoggingConfig(level="TRACE")
 
 
+class TestSyncConfig:
+    """Tests for SyncConfig."""
+
+    def test_default_values(self):
+        """Test default sync configuration."""
+        config = SyncConfig()
+        assert config.enabled is False
+        assert config.remote == ""
+        assert config.files == "tiff"
+
+    def test_valid_files_options(self):
+        """Test valid files options."""
+        for option in ("tiff", "composite", "all"):
+            config = SyncConfig(files=option)
+            assert config.files == option
+
+    def test_invalid_files_option(self):
+        """Test that invalid files option raises error."""
+        with pytest.raises(ValueError, match="sync.files must be one of"):
+            SyncConfig(files="invalid")
+
+    def test_enabled_without_remote(self):
+        """Test that enabling sync without remote raises error."""
+        with pytest.raises(ValueError, match="sync.remote must be set"):
+            SyncConfig(enabled=True, remote="")
+
+    def test_enabled_with_remote(self):
+        """Test valid enabled config with remote."""
+        config = SyncConfig(enabled=True, remote="gdrive:analemma")
+        assert config.enabled is True
+        assert config.remote == "gdrive:analemma"
+
+
 class TestConfig:
     """Tests for main Config class."""
 
@@ -125,6 +159,16 @@ class TestConfig:
         assert config.storage.monthly_subfolders is False
         assert config.logging.level == "DEBUG"
 
+    def test_from_dict_with_sync(self):
+        """Test creating Config with sync settings."""
+        data = {
+            "sync": {"enabled": True, "remote": "gdrive:test", "files": "composite"},
+        }
+        config = Config.from_dict(data)
+        assert config.sync.enabled is True
+        assert config.sync.remote == "gdrive:test"
+        assert config.sync.files == "composite"
+
     def test_to_dict(self):
         """Test converting Config to dictionary."""
         config = Config()
@@ -133,7 +177,9 @@ class TestConfig:
         assert "schedule" in data
         assert "storage" in data
         assert "logging" in data
+        assert "sync" in data
         assert data["camera"]["exposure_us"] == 1000
+        assert data["sync"]["enabled"] is False
 
 
 class TestLoadSaveConfig:

@@ -47,3 +47,13 @@ logging:
 
   # Number of backup log files to keep
   backup_count: 5
+
+sync:
+  # Enable automatic sync to remote after each capture
+  enabled: false
+
+  # rclone remote and path (run 'rclone config' to set up first)
+  remote: "gdrive:analemma"
+
+  # What to sync: "tiff" (individual TIFFs), "composite" (composite only), "all" (everything)
+  files: "tiff"

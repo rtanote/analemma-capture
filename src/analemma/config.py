@@ -84,6 +84,23 @@ class LoggingConfig:
 
 
 @dataclass
+class SyncConfig:
+    """Remote sync configuration settings."""
+
+    enabled: bool = False
+    remote: str = ""  # e.g. "gdrive:analemma"
+    files: str = "tiff"  # "tiff", "composite", "all"
+
+    def __post_init__(self) -> None:
+        """Validate configuration values."""
+        valid_files = ("tiff", "composite", "all")
+        if self.files not in valid_files:
+            raise ValueError(f"sync.files must be one of {valid_files}")
+        if self.enabled and not self.remote:
+            raise ValueError("sync.remote must be set when sync is enabled")
+
+
+@dataclass
 class Config:
     """Main configuration container."""
 
@@ -91,6 +108,7 @@ class Config:
     schedule: ScheduleConfig = field(default_factory=ScheduleConfig)
     storage: StorageConfig = field(default_factory=StorageConfig)
     logging: LoggingConfig = field(default_factory=LoggingConfig)
+    sync: SyncConfig = field(default_factory=SyncConfig)
 
     @classmethod
     def from_dict(cls, data: dict) -> "Config":
@@ -100,11 +118,14 @@ class Config:
         storage_data = data.get("storage", {})
         logging_data = data.get("logging", {})
 
+        sync_data = data.get("sync", {})
+
         return cls(
             camera=CameraConfig(**camera_data),
             schedule=ScheduleConfig(**schedule_data),
             storage=StorageConfig(**storage_data),
             logging=LoggingConfig(**logging_data),
+            sync=SyncConfig(**sync_data),
         )
 
     def to_dict(self) -> dict:
@@ -131,6 +152,11 @@ class Config:
                 "file": str(self.logging.file) if self.logging.file else None,
                 "max_size_mb": self.logging.max_size_mb,
                 "backup_count": self.logging.backup_count,
+            },
+            "sync": {
+                "enabled": self.sync.enabled,
+                "remote": self.sync.remote,
+                "files": self.sync.files,
             },
         }
 

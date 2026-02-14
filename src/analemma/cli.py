@@ -257,5 +257,92 @@ def list_images(ctx: click.Context, month: Optional[str], as_json: bool) -> None
         click.echo(f"  {img}")
 
 
+@cli.command()
+@click.option(
+    "--force",
+    "-f",
+    is_flag=True,
+    help="Re-convert even if TIFF already exists",
+)
+@click.pass_context
+def convert(ctx: click.Context, force: bool) -> None:
+    """Convert all FITS files to TIFF format."""
+    config_path = ctx.obj.get("config_path")
+    config = load_config(config_path)
+
+    from analemma.postprocess import batch_convert_fits
+
+    base_path = config.storage.base_path
+    click.echo(f"Searching for FITS files in {base_path}...")
+
+    converted = batch_convert_fits(base_path, force=force)
+
+    if converted:
+        click.echo(f"Converted {len(converted)} file(s):")
+        for p in converted:
+            click.echo(f"  {p}")
+    else:
+        click.echo("No new files to convert (all FITS files already have TIFFs).")
+
+
+@cli.command()
+@click.option(
+    "--output",
+    "-o",
+    type=click.Path(path_type=Path),
+    help="Output path for composite image",
+)
+@click.pass_context
+def composite(ctx: click.Context, output: Optional[Path]) -> None:
+    """Generate analemma composite image from all TIFFs."""
+    config_path = ctx.obj.get("config_path")
+    config = load_config(config_path)
+
+    from analemma.postprocess import PostProcessError, create_composite
+
+    base_path = config.storage.base_path
+    click.echo(f"Creating composite from TIFF files in {base_path}...")
+
+    try:
+        result = create_composite(base_path, output)
+        click.echo(f"Composite saved: {result}")
+        click.echo(f"PNG copy: {result.with_suffix('.png')}")
+    except PostProcessError as e:
+        click.echo(f"Error: {e}", err=True)
+        ctx.exit(1)
+
+
+@cli.command()
+@click.pass_context
+def sync(ctx: click.Context) -> None:
+    """Sync files to remote using rclone."""
+    config_path = ctx.obj.get("config_path")
+    config = load_config(config_path)
+
+    from analemma.postprocess import sync_to_remote
+
+    if not config.sync.remote:
+        click.echo(
+            "Error: sync.remote not configured. "
+            "Set it in config.yaml or run 'rclone config' first.",
+            err=True,
+        )
+        ctx.exit(1)
+
+    # Force enabled for manual invocation
+    config.sync.enabled = True
+
+    click.echo(f"Syncing to {config.sync.remote}...")
+    click.echo(f"  Files: {config.sync.files}")
+
+    success = sync_to_remote(config.storage.base_path, config.sync)
+
+    if success:
+        click.echo("Sync completed successfully.")
+    else:
+        click.echo("Sync failed. Check logs for details.", err=True)
+        ctx.exit(1)
+
+
 if __name__ == "__main__":
     cli()

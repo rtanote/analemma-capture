@@ -21,6 +21,7 @@ from analemma.camera import (
 from analemma.config import Config, load_config
 from analemma.logger import get_logger, setup_logger
 from analemma.scheduler import CaptureScheduler
+from analemma.postprocess import run_post_pipeline
 from analemma.storage import CaptureMetadata, ImageStorage, StorageError
 
 logger = get_logger(__name__)
@@ -131,6 +132,14 @@ class AnalemmaSystem:
             self._last_capture_time = capture_time.isoformat()
             self._last_capture_path = str(save_path)
             self._save_status()
+
+            # Run post-processing pipeline (fault-tolerant)
+            if self.config.camera.image_type == "fits":
+                run_post_pipeline(
+                    fits_path=save_path,
+                    base_path=self.config.storage.base_path,
+                    sync_config=self.config.sync,
+                )
 
             logger.info(
                 f"Capture workflow completed successfully. "
